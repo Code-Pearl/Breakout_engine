@@ -1,0 +1,138 @@
+[
+ {
+  "ts": "2026-09-15 11:14",
+  "type": "run",
+  "label": "run 200 ideas on data_cache",
+  "ok": true,
+  "duration_s": 35.1,
+  "error": ""
+ },
+ {
+  "ts": "2026-09-15 11:13",
+  "type": "run",
+  "label": "run 200 ideas on data_cache",
+  "ok": true,
+  "duration_s": 25.7,
+  "error": ""
+ },
+ {
+  "ts": "2026-09-15 11:12",
+  "type": "run",
+  "label": "run 200 ideas on data_cache",
+  "ok": true,
+  "duration_s": 27.6,
+  "error": ""
+ },
+ {
+  "ts": "2026-09-15 09:33",
+  "type": "run",
+  "label": "run 150 ideas on data_cache",
+  "ok": true,
+  "duration_s": 15.2,
+  "error": ""
+ },
+ {
+  "ts": "2026-09-15 09:32",
+  "type": "fetch",
+  "label": "1h",
+  "ok": true,
+  "duration_s": 3.2,
+  "error": ""
+ },
+ {
+  "ts": "2026-09-15 09:32",
+  "type": "fetch",
+  "label": "1d",
+  "ok": true,
+  "duration_s": 0.1,
+  "error": ""
+ },
+ {
+  "ts": "2026-09-15 09:32",
+  "type": "run",
+  "label": "run 150 ideas on data_cache",
+  "ok": true,
+  "duration_s": 12.8,
+  "error": ""
+ },
+ {
+  "ts": "2026-09-15 00:32",
+  "type": "run",
+  "label": "run 500 ideas on data_cache",
+  "ok": true,
+  "duration_s": 43.5,
+  "error": ""
+ },
+ {
+  "ts": "2026-09-15 00:22",
+  "type": "run",
+  "label": "run 20 ideas on data_cache",
+  "ok": true,
+  "duration_s": 2.8,
+  "error": ""
+ },
+ {
+  "ts": "2026-09-15 00:21",
+  "type": "run",
+  "label": "run 20 ideas on data_cache",
+  "ok": true,
+  "duration_s": 1.4,
+  "error": ""
+ },
+ {
+  "ts": "2026-09-14 23:47",
+  "type": "run",
+  "label": "run 3 ideas on data_cache",
+  "ok": true,
+  "duration_s": 0.3,
+  "error": ""
+ },
+ {
+  "ts": "2026-09-14 23:43",
+  "type": "run",
+  "label": "run 3 ideas on data_cache",
+  "ok": true,
+  "duration_s": 0.5,
+  "error": ""
+ },
+ {
+  "ts": "2026-09-14 23:41",
+  "type": "fetch",
+  "label": "1d",
+  "ok": true,
+  "duration_s": 0.1,
+  "error": ""
+ },
+ {
+  "ts": "2026-09-14 23:39",
+  "type": "run",
+  "label": "run 2 ideas on data_cache",
+  "ok": true,
+  "duration_s": 0.4,
+  "error": ""
+ },
+ {
+  "ts": "2026-09-14 23:37",
+  "type": "run",
+  "label": "run 2 ideas on data_cache",
+  "ok": true,
+  "duration_s": 0.3,
+  "error": ""
+ },
+ {
+  "ts": "2026-09-14 23:34",
+  "type": "run",
+  "label": "run 3 ideas on data_cache",
+  "ok": true,
+  "duration_s": 2.2,
+  "error": ""
+ },
+ {
+  "ts": "2026-09-14 23:33",
+  "type": "fetch",
+  "label": "1d",
+  "ok": true,
+  "duration_s": 2.9,
+  "error": ""
+ }
+]

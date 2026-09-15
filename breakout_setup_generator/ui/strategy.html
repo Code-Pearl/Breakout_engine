@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<!-- Strategy chart. Look/feel lifted from chart-referance/chart.html:
+     dark theme tokens, pill header, chart box + legend, stats grid.
+     Candles + entry/exit markers in the main pane; the equity curve lives
+     in its own pane ABOVE the price chart, labelled and shown as %. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Strategy · BreakoutLab</title>
+<script src="lightweight-charts.js"
+        onerror="var s=document.createElement('script');s.src='https://unpkg.com/lightweight-charts@5/dist/lightweight-charts.standalone.production.js';document.head.appendChild(s);"></script>
+<style>
+:root{--bg:#0a0d13;--card:#12161f;--card-2:#181d28;--border:#232a36;--text:#e5e7eb;--muted:#94a3b8;--accent:#3b82f6;--green:#22c55e;--red:#ef4444}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.header{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--card);flex-wrap:wrap}
+.label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.pill{background:var(--card-2);border:1px solid var(--border);color:var(--text);font-size:12px;font-weight:500;padding:5px 11px;border-radius:6px;cursor:pointer;font-family:inherit}
+.pill:hover{border-color:#334155}
+.pill.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.spacer{flex:1}
+.back{color:var(--muted);text-decoration:none;font-size:13px;display:inline-flex;align-items:center;gap:6px}
+.back svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.back:hover{color:var(--text)}
+.main{flex:1;min-height:0;display:flex;gap:8px;padding:8px 16px}
+.chart-col{flex:3;min-width:0;display:flex;flex-direction:column;gap:8px}
+.box{border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--card);position:relative}
+.box-price{flex:1;min-height:0}
+#chart{width:100%;height:100%}
+.eq-box{height:148px;flex:0 0 auto;display:flex;flex-direction:column}
+.eq-hdr{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:6px 12px;border-bottom:1px solid var(--border)}
+.eq-title{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.eq-now{font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+.eq-now.up{color:var(--green)}
+.eq-now.down{color:var(--red)}
+.eq-now sub{font-size:10px;color:var(--muted);font-weight:600}
+#eqChart{flex:1;min-height:0}
+.chart-legend{position:absolute;top:8px;left:10px;z-index:6;pointer-events:none;display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:4px 10px;max-width:calc(100% - 20px)}
+.chart-legend .sym{font-weight:700;font-size:12.5px}
+.chart-legend .k{color:var(--muted);margin-right:3px}
+.side{flex:1;min-width:260px;max-width:360px;display:flex;flex-direction:column;gap:8px;overflow-y:auto}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.card h3{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px}
+.mono{font-family:Consolas,monospace;font-size:12px;line-height:1.7;white-space:pre-wrap}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{padding:6px 10px;border-radius:6px;background:var(--card-2)}
+.stat .k{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.stat .v{font-size:15px;font-weight:600;margin-top:2px}
+.up{color:var(--green)}.down{color:var(--red)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+td,th{padding:5px 6px;text-align:right;border-bottom:1px solid var(--border)}
+td:first-child,th:first-child{text-align:left}
+th{color:var(--muted);font-weight:600;font-size:11px}
+#cdn-fail{display:none;color:var(--red);padding:20px}
+</style>
+</head>
+<body>
+<div class="header">
+  <a class="back" href="/"><svg viewBox="0 0 24 24"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>Runs</a>
+  <span class="label">Symbol</span><span id="symbols"></span>
+  <div class="spacer"></div>
+  <span class="label" id="title">—</span>
+</div>
+<div class="main">
+  <div class="chart-col">
+    <div class="box eq-box">
+      <div class="eq-hdr">
+        <span class="eq-title">Equity Curve</span>
+        <span class="eq-now" id="eq-now">—</span>
+      </div>
+      <div id="eqChart"></div>
+    </div>
+    <div class="box box-price"><div id="chart"></div><div class="chart-legend" id="legend"></div>
+      <div id="cdn-fail">Could not load lightweight-charts.</div></div>
+  </div>
+  <div class="side">
+    <div class="card"><h3>Formula</h3><div class="mono" id="formula">—</div></div>
+    <div class="card"><h3>Score</h3><div class="stats" id="stats"></div></div>
+    <div class="card"><h3>Per-asset</h3><table id="patable"><thead><tr><th>Asset</th><th>Trades</th><th>Ret%</th><th>PF</th><th>Sharpe</th></tr></thead><tbody></tbody></table></div>
+  </div>
+</div>
+<script>
+"use strict";
+const sid = new URLSearchParams(location.search).get("sid");
+const src = new URLSearchParams(location.search).get("src") || "cache";
+let chart, eqChart, candles, equityEquity, markersHandle = null, curSymbol = null;
+
+function boot(){
+  if(!window.LightweightCharts){ document.getElementById("cdn-fail").style.display="block"; return; }
+  const baseOpts = {
+    layout:{ background:{type:0,color:"transparent"}, textColor:"#a6adbb", attributionLogo:false },
+    grid:{ vertLines:{color:"rgba(166,173,187,0.1)"}, horzLines:{color:"rgba(166,173,187,0.1)"} },
+    rightPriceScale:{ borderColor:"rgba(166,173,187,0.2)" },
+    timeScale:{ borderColor:"rgba(166,173,187,0.2)", rightOffset:6 },
+  };
+  // main price chart: candles + trade markers
+  chart = LightweightCharts.createChart(document.getElementById("chart"), baseOpts);
+  candles = chart.addSeries(LightweightCharts.CandlestickSeries, {
+    upColor:"#4169e1", downColor:"#ef4444", borderVisible:false, wickUpColor:"#4169e1", wickDownColor:"#ef4444" });
+  markersHandle = LightweightCharts.createSeriesMarkers(candles, []);
+  // equity pane above the price chart
+  eqChart = LightweightCharts.createChart(document.getElementById("eqChart"), {
+    ...structuredClone(baseOpts),
+    timeScale:{ borderColor:"rgba(166,173,187,0.2)", rightOffset:6, visible:false },
+    rightPriceScale:{ borderColor:"rgba(166,173,187,0.2)", scaleMargins:{ top:0.12, bottom:0.12 } },
+  });
+  equityEquity = eqChart.addSeries(LightweightCharts.LineSeries, {
+    color:"#facc15", lineWidth:2, priceLineVisible:false,
+    priceFormat:{ type:"percent", precision:2 } });
+  // keep both time axes in sync (equity pane follows candle pane)
+  chart.timeScale().subscribeVisibleLogicalRangeChange(r => {
+    if (r) eqChart.timeScale().setVisibleLogicalRange(r);
+  });
+  new ResizeObserver(()=>chart.applyOptions({ width:chartEl().clientWidth, height:chartEl().clientHeight })).observe(chartEl());
+  new ResizeObserver(()=>eqChart.applyOptions({ width:eqChartEl().clientWidth, height:eqChartEl().clientHeight })).observe(eqChartEl());
+  load();
+}
+function chartEl(){ return document.getElementById("chart"); }
+function eqChartEl(){ return document.getElementById("eqChart"); }
+
+async function load(){
+  const [detail, syms] = await Promise.all([
+    fetch(`/api/strategy/${sid}`).then(r=>r.json()),
+    fetch(`/api/symbols?src=${src}`).then(r=>r.json()),
+  ]);
+  if(detail.error){ document.getElementById("title").textContent = detail.error; return; }
+  const row = detail.row;
+  document.getElementById("title").textContent = `#${row.strategy_id} · score ${row.robustness_score} · ${row.label}`;
+  document.getElementById("formula").textContent = detail.formula.join("\n");
+  document.getElementById("stats").innerHTML =
+    stat("Robustness", row.robustness_score) + stat("Eligible", row.eligible ? "YES" : "no") +
+    stat("Trades", row.total_trades) + stat("Profit factor", row.avg_profit_factor) +
+    stat("Sharpe", row.avg_sharpe) + stat("Params", row.n_params);
+  document.querySelector("#patable tbody").innerHTML = Object.entries(detail.per_asset).map(([s,v])=>
+    `<tr><td>${s}</td><td>${v.trades??"—"}</td><td class="${(v.return_pct??0)>=0?"up":"down"}">${v.return_pct??"—"}</td><td>${v.pf??"—"}</td><td>${v.sharpe??"—"}</td></tr>`).join("");
+  const box = document.getElementById("symbols"); box.innerHTML = "";
+  (syms.symbols||[]).forEach((s,i)=>{
+    const b = document.createElement("button");
+    b.className = "pill" + (i===0 ? " active" : ""); b.textContent = s;
+    b.onclick = ()=>{ box.querySelectorAll(".pill").forEach(x=>x.classList.remove("active")); b.classList.add("active"); showSymbol(s); };
+    box.appendChild(b);
+  });
+  if(syms.symbols && syms.symbols.length) showSymbol(syms.symbols[0]);
+}
+function stat(k,v){ return `<div class="stat"><div class="k">${k}</div><div class="v">${v??"—"}</div></div>`; }
+
+async function showSymbol(symbol){
+  curSymbol = symbol;
+  const [bars, tr] = await Promise.all([
+    fetch(`/api/bars?src=${src}&symbol=${symbol}&limit=0`).then(r=>r.json()),
+    fetch(`/api/trades?src=${src}&symbol=${symbol}&strategy=${sid}`).then(r=>r.json()),
+  ]);
+  chart.applyOptions({ timeScale:{ timeVisible: !!bars.intraday, secondsVisible:false } });
+  candles.setData(bars.bars.map(({time,open,high,low,close})=>({time,open,high,low,close})));
+  markersHandle.setMarkers(tr.markers||[]);
+  const eq = tr.equity||[];
+  equityEquity.setData(eq.map(p=>({ time:p.time, value:p.value-1 })));
+  const last = eq.length ? eq[eq.length-1].value : null;
+  const finalPct = (last-1)*100;
+  document.getElementById("eq-now").innerHTML =
+    last==null ? "—" : (finalPct>=0?"+":"")+finalPct.toFixed(2) + "%" +
+    `<sub> </sub>`;
+  document.getElementById("eq-now").className = "eq-now" + (finalPct>=0?" up":" down");
+  const px = bars.bars[bars.bars.length-1];
+  document.getElementById("legend").innerHTML =
+    `<span class="sym">${symbol}</span><span><span class="k">trades</span>${tr.trades}</span>` +
+    (px ? `<span><span class="k">last</span>${px.close}</span>` : "");
+  chart.timeScale().fitContent();
+}
+boot();
+</script>
+</body>
+</html>

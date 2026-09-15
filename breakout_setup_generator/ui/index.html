@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<!-- BreakoutLab: main window. Component kit lifted from chart-referance/index.html
+     (sidebar, topbar, ctrl-strip, stat chips, table, log console, modal, toast).
+     Charting lives in strategy.html (chart-referance/chart.html styling). -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BreakoutLab</title>
+<script src="socket.io.min.js"></script>
+<script>if(!window.io){var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js';document.head.appendChild(s);}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Faculty+Glyphic:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f2f5;--surface:#fff;--surface2:#f8f9fb;--border:#e8ecf0;--border2:#d4dae2;
+  --text:#5a6478;--text2:#1e2535;--text3:#8a93a6;
+  --primary:#3182ce;--primary-light:#ebf4ff;--primary-hover:#2b6cb0;--charcoal:#1e2535;
+  --green:#38a169;--green-bg:#f0fff4;--red:#e53e3e;--red-bg:#fff5f5;
+  --blue:#3182ce;--blue-bg:#ebf8ff;--purple:#6b46c1;
+  --sidebar-w:240px;--hdr:64px;--r:12px;--rs:8px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 12px rgba(0,0,0,.08);
+  --transition:all .25s cubic-bezier(.4,0,.2,1);
+}
+body{font-family:'Faculty Glyphic','Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;height:100vh;overflow:hidden}
+#app{display:flex;height:100vh;overflow:hidden}
+#sidebar{width:var(--sidebar-w);background:var(--charcoal);display:flex;flex-direction:column;flex-shrink:0}
+.logo-area{padding:24px 20px 16px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:11px}
+  .logo-icon{width:36px;height:36px;flex-shrink:0;object-fit:contain}
+.brand{font-weight:700;font-size:15px;color:#fff;letter-spacing:.02em;text-transform:uppercase}
+.brand-sub{font-size:10px;color:rgba(255,255,255,.3);margin-top:2px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+.nav-sec{padding:18px 12px 8px}
+.nav-lbl{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.18);padding:0 10px 10px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:7px;color:rgba(255,255,255,.5);cursor:pointer;transition:var(--transition);font-size:12px;font-weight:700;margin-bottom:2px;text-transform:uppercase;letter-spacing:.06em}
+  .nav-item svg{width:15px;height:15px;flex:none;opacity:.85}
+.nav-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.85)}
+.nav-item.active{background:var(--primary);color:#fff}
+.sidebar-footer{margin-top:auto;padding:16px 20px;border-top:1px solid rgba(255,255,255,.05);font-size:11px;color:rgba(255,255,255,.3)}
+.sidebar-footer img{max-width:100%;height:auto;opacity:.9}
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.page{display:none;flex:1;flex-direction:column;overflow:hidden}
+.page.active{display:flex}
+.topbar{height:var(--hdr);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;gap:10px;flex-shrink:0}
+.topbar-title{font-size:18px;font-weight:700;flex:1;color:var(--text2);letter-spacing:-.02em}
+.topbar-sub{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.08em}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--rs);font-size:12px;font-weight:700;cursor:pointer;transition:var(--transition);border:1.5px solid transparent;white-space:nowrap;text-transform:uppercase;letter-spacing:.05em;font-family:inherit}
+.btn-primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+.btn-primary:hover{background:var(--primary-hover);box-shadow:0 4px 14px rgba(49,130,206,.35)}
+.btn-outline{background:var(--surface);border:1.5px solid var(--border2);color:var(--text2)}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
+.btn-ghost{background:var(--surface2);color:var(--text2);border:1.5px solid var(--border)}
+.btn-ghost:hover{background:var(--border)}
+.btn-sm{padding:7px 13px;font-size:11px}
+.btn:disabled{opacity:.4;cursor:not-allowed;pointer-events:none}
+#ctrl-strip{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap;flex-shrink:0}
+.cg{display:flex;flex-direction:column;gap:4px;min-width:90px}
+.cg.grow{flex:1;min-width:120px}
+.cl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em}
+select,input[type=text],input[type=number]{padding:8px 12px;border:1.5px solid var(--border2);border-radius:var(--rs);font-size:13px;font-weight:600;color:var(--text2);background:var(--surface2);outline:none;font-family:inherit;width:100%}
+select:focus,input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(49,130,206,.12);background:var(--surface)}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5'%3E%3Cpath d='M0 0l4.5 5 4.5-5z' fill='%238A93A6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+#content{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:20px 28px 0;gap:14px}
+.toolbar{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.spacer{flex:1}
+.stats-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.stat-chip{display:flex;align-items:center;gap:7px;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;border:1.5px solid var(--border);background:var(--surface)}
+.stat-chip .sv{font-size:14px;font-weight:800;color:var(--text2)}
+.table-scroll{flex:1;overflow-y:auto;border:1.5px solid var(--border);border-radius:var(--r);background:var(--surface);box-shadow:var(--shadow-sm);min-height:120px}
+table{width:100%;border-collapse:collapse}
+thead th{background:var(--surface2);padding:11px 12px;text-align:left;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);border-bottom:1.5px solid var(--border);position:sticky;top:0;z-index:2}
+tbody tr{border-bottom:1px solid var(--border);cursor:pointer}
+tbody tr:hover{background:var(--primary-light)}
+tbody td{padding:10px 12px;font-size:13px;color:var(--text2);font-weight:500}
+td.score{font-weight:800;color:var(--primary)}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase}
+.b-ok{background:var(--green-bg);color:var(--green)}
+.b-no{background:#f1f5f9;color:#64748b}
+.b-waiting{background:#f1f5f9;color:#64748b}
+.b-downloading{background:var(--blue-bg);color:var(--blue)}
+.b-success{background:var(--green-bg);color:var(--green)}
+.b-error{background:var(--red-bg);color:var(--red)}
+#log-panel{height:168px;background:var(--charcoal);display:flex;flex-direction:column;flex-shrink:0;margin-top:16px;border-radius:var(--r) var(--r) 0 0;overflow:hidden}
+.log-hdr{display:flex;align-items:center;gap:8px;padding:8px 18px;border-bottom:1px solid rgba(255,255,255,.05);background:rgba(0,0,0,.12)}
+.log-dot{width:6px;height:6px;border-radius:50%;background:#48bb78;box-shadow:0 0 6px #48bb78}
+.log-dot.idle{background:rgba(255,255,255,.2);box-shadow:none}
+.log-title-txt{font-size:10px;font-weight:800;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.12em;flex:1}
+#log-body{flex:1;overflow-y:auto;padding:8px 18px;font-family:Consolas,monospace;font-size:11px;color:#a0aec0;line-height:1.65}
+.l-success{color:#68d391}.l-error{color:#fc8181}.l-ts{color:rgba(255,255,255,.13);margin-right:7px}
+#prog-wrap{height:2px;background:rgba(49,130,206,.08);flex-shrink:0}
+#prog-bar{height:100%;background:var(--primary);width:0%;transition:width .4s}
+#inner{flex:1;overflow-y:auto;padding:24px 28px}
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;max-width:1100px}
+.sc{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow-sm);overflow:hidden}
+.sc-hdr{padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface2);font-size:14px;font-weight:700;color:var(--text2)}
+.sc-body{padding:16px 18px;display:flex;flex-direction:column;gap:10px;font-size:13px}
+.fg{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.fc{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:7px;box-shadow:var(--shadow-sm)}
+.fc:hover{border-color:var(--primary)}
+.fn{font-weight:700;font-size:13px;color:var(--primary);word-break:break-all}
+.fm{font-size:11px;color:var(--text3);font-weight:600}
+#toast{position:fixed;bottom:24px;right:24px;background:var(--charcoal);color:#fff;padding:11px 18px;border-radius:var(--rs);font-size:13px;font-weight:700;box-shadow:var(--shadow-md);opacity:0;transform:translateY(8px);transition:all .3s;z-index:999;pointer-events:none}
+#toast.show{opacity:1;transform:translateY(0)}
+#toast.err{background:var(--red)}
+.muted{color:var(--text3);font-size:12px}
+</style>
+</head>
+<body>
+<div id="app">
+  <nav id="sidebar">
+    <div class="logo-area">
+      <img class="logo-icon" src="breakoutLOGO.svg" alt="BreakoutLab logo" />
+      <div>
+        <div class="brand">BreakoutLab</div>
+        <div class="brand-sub">Setup Generator UI</div>
+      </div>
+    </div>
+    <div class="nav-sec">
+      <div class="nav-lbl">Main</div>
+      <div class="nav-item active" data-page="runs" onclick="showPage(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg> Runs</div>
+      <div class="nav-item" data-page="history" onclick="showPage(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg> Backlog</div>
+      <div class="nav-item" data-page="files" onclick="showPage(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg> Output Files</div>
+    </div>
+    <div class="nav-sec">
+      <div class="nav-lbl">Config</div>
+      <div class="nav-item" data-page="data" onclick="showPage(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg> Live Data</div>
+    </div>
+    <div class="sidebar-footer"><img src="footer_light.svg" alt="Investing Compass" style="max-height:44px;width:auto;"></div>
+  </nav>
+
+  <div id="main">
+    <div id="prog-wrap"><div id="prog-bar"></div></div>
+
+    <!-- RUNS -->
+    <div id="page-runs" class="page active">
+      <div class="topbar">
+        <div style="flex:1"><div class="topbar-title">Backtest Runs</div><div class="topbar-sub" id="topbar-sub">Ready</div></div>
+        <button class="btn btn-primary" id="btn-run" onclick="startRun()"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M6 4l14 8-14 8V4z"/></svg> Run</button>
+      </div>
+      <div id="ctrl-strip">
+        <div class="cg grow"><div class="cl">Data</div><select id="c-src">
+          <option value="cache" selected>Downloaded cache (live)</option>
+          <option value="real">real_data\ snapshot</option>
+          <option value="intraday">real_intraday_data\</option>
+          <option value="custom">Custom folder</option></select></div>
+        <div class="cg"><div class="cl">Ideas</div><input type="number" id="c-num" value="150" min="1" /></div>
+        <div class="cg"><div class="cl">Top</div><input type="number" id="c-top" value="15" min="1" /></div>
+        <div class="cg"><div class="cl">Min trades</div><input type="number" id="c-min" value="15" min="0" /></div>
+        <div class="cg grow"><div class="cl">Sizing</div><select id="c-size">
+          <option value="full_compounding" selected>full_compounding</option>
+          <option value="fixed_fractional">fixed_fractional</option></select></div>
+        <div class="cg"><div class="cl">Risk %</div><input type="number" id="c-risk" value="10" min="1" max="100" /></div>
+        <div class="cg"><div class="cl">Validate</div><input type="number" id="c-val" value="0" min="0" /></div>
+        <div class="cg"><div class="cl">Export</div><input type="number" id="c-exp" value="0" min="0" /></div>
+        <div class="cg"><div class="cl">Amipy</div><input type="number" id="c-ami" value="0" min="0" /></div>
+        <div class="cg"><div class="cl">Plots</div><input type="number" id="c-plot" value="10" min="0" /></div>
+        <div class="cg"><div class="cl">Seed</div><input type="text" id="c-seed" placeholder="random" /></div>
+      </div>
+      <div id="content">
+        <div class="toolbar">
+          <div class="stats-row">
+            <div class="stat-chip"><span class="sv" id="st-runs">0</span> runs</div>
+            <div class="stat-chip"><span class="sv" id="st-ideas">0</span> ideas seen</div>
+            <div class="stat-chip"><span class="sv" id="st-lb">0</span> leaderboard</div>
+            <div class="stat-chip"><span class="sv" id="st-cache">0</span> cached symbols</div>
+          </div>
+          <div class="spacer"></div>
+          <span class="muted">click a row to open its chart</span>
+        </div>
+        <div class="table-scroll"><table>
+          <thead><tr><th>#</th><th>Score</th><th>Elig</th><th>Trades</th><th>PF</th><th>Sharpe</th><th>Setup</th></tr></thead>
+          <tbody id="tbody"><tr><td colspan="7" class="muted">no run yet — hit Run</td></tr></tbody>
+        </table></div>
+        <div id="log-panel">
+          <div class="log-hdr"><div class="log-dot idle" id="log-dot"></div><div class="log-title-txt">Activity Log</div></div>
+          <div id="log-body"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BACKLOG -->
+    <div id="page-history" class="page">
+      <div class="topbar"><div style="flex:1"><div class="topbar-title">Backlog</div><div class="topbar-sub">every run &amp; download, newest first</div></div>
+        <button class="btn btn-ghost btn-sm" onclick="loadHistory()">Refresh</button></div>
+      <div id="inner"><div class="table-scroll" style="max-height:100%"><table>
+        <thead><tr><th>Time</th><th>Type</th><th>Label</th><th>Status</th><th>Duration</th><th>Detail</th></tr></thead>
+        <tbody id="hist-body"><tr><td colspan="6" class="muted">nothing yet</td></tr></tbody>
+      </table></div></div>
+    </div>
+
+    <!-- FILES -->
+    <div id="page-files" class="page">
+      <div class="topbar"><div style="flex:1"><div class="topbar-title">Output Files</div><div class="topbar-sub" id="files-count">—</div></div>
+        <button class="btn btn-ghost btn-sm" onclick="loadFiles()">Refresh</button></div>
+      <div id="inner"><div class="fg" id="fg"></div></div>
+    </div>
+
+    <!-- DATA -->
+    <div id="page-data" class="page">
+      <div class="topbar"><div style="flex:1"><div class="topbar-title">Live Data</div><div class="topbar-sub">Yahoo Finance &middot; cached in data_cache\</div></div></div>
+      <div id="inner"><div class="sg" id="sg">
+        <div class="sc"><div class="sc-hdr">Daily bars</div><div class="sc-body">
+          <span class="muted">SPY · GLD · BTC-USD · EURUSD · TNX, full history. Reused while fresh (1 day).</span>
+          <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm" onclick="doFetch('1d',false)">Download</button>
+          <button class="btn btn-outline btn-sm" onclick="doFetch('1d',true)">Force refresh</button></div></div></div>
+        <div class="sc"><div class="sc-hdr">Hourly bars</div><div class="sc-body">
+          <span class="muted">Last ~2 years (Yahoo limit). For intraday-style runs.</span>
+          <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm" onclick="doFetch('1h',false)">Download</button>
+          <button class="btn btn-outline btn-sm" onclick="doFetch('1h',true)">Force refresh</button></div></div></div>
+        <div class="sc"><div class="sc-hdr">Add assets</div><div class="sc-body">
+          <span class="muted">Yahoo tickers, comma-separated. Saves as <code>SYM_daily.csv</code> / <code>SYM_hourly.csv</code>.</span>
+          <div style="display:flex;gap:8px;margin-top:4px">
+            <input type="text" id="new-symbols" placeholder="AAPL, MSFT, GC=F" style="flex:1;min-width:150px" />
+            <select id="new-interval" style="width:110px"><option value="1d">Daily</option><option value="1h">Hourly</option></select>
+            <button class="btn btn-primary btn-sm" onclick="doCustomFetch()">Download</button>
+          </div></div></div>
+        <div class="sc"><div class="sc-hdr">Cache status</div><div class="sc-body" id="cache-status"><span class="muted">—</span></div></div>
+      </div>
+      <div class="sg" style="margin-top:16px;max-width:none">
+        <div class="sc" style="grid-column:1/-1"><div class="sc-hdr">Download backlog</div>
+          <div class="sc-body"><div class="table-scroll" style="max-height:320px"><table>
+            <thead><tr><th>Symbol</th><th>Status</th><th>Bars</th><th>File</th><th>Message</th><th>Updated</th></tr></thead>
+            <tbody id="dl-body"><tr><td colspan="6" class="muted">no downloads yet</td></tr></tbody>
+          </table></div></div></div>
+      </div></div>
+    </div>
+
+  </div>
+</div>
+<div id="toast"></div>
+<script>
+const socket = io();
+socket.on("log", e => appendLog(e.ts, e.msg, e.level || "info"));
+socket.on("run_state", s => setRunning(s.running, s.label));
+socket.on("run_done", r => { setRunning(false); setProgress(0); refreshAll(); toast(r.ok ? "Done" : ("Failed: " + (r.error || "")), !r.ok); });
+socket.on("dl_status", e => patchDlRow(e));
+
+function showPage(el){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+  document.getElementById("page-"+el.dataset.page).classList.add("active");
+  el.classList.add("active");
+  if(el.dataset.page==="files") loadFiles();
+  if(el.dataset.page==="data") { refreshStatus(); loadDl(); }
+  if(el.dataset.page==="history") loadHistory();
+}
+function toast(msg, isErr=false){
+  const el=document.getElementById("toast");
+  el.textContent=msg; el.className="show"+(isErr?" err":"");
+  clearTimeout(toast._t); toast._t=setTimeout(()=>el.className="",2800);
+}
+function appendLog(ts,msg,level){
+  const body=document.getElementById("log-body");
+  const d=document.createElement("div");
+  d.innerHTML=`<span class="l-ts">${ts}</span><span class="l-${level}">${msg.replace(/&/g,"&amp;").replace(/</g,"&lt;")}</span>`;
+  body.appendChild(d); body.scrollTop=body.scrollHeight;
+}
+function setRunning(v,label){
+  document.getElementById("btn-run").disabled=v;
+  document.getElementById("topbar-sub").textContent=v?("Running — "+(label||"")):"Ready";
+  document.getElementById("log-dot").className="log-dot "+(v?"":"idle");
+  setProgress(v?-1:100);
+}
+function setProgress(p){ document.getElementById("prog-bar").style.width=(p<0?100:Math.min(p,100))+"%"; }
+
+async function refreshStatus(){
+  const s=await fetch("/api/status").then(r=>r.json());
+  document.getElementById("st-runs").textContent=s.runs;
+  document.getElementById("st-ideas").textContent=s.ideas_seen;
+  document.getElementById("st-lb").textContent=s.leaderboard;
+  document.getElementById("st-cache").textContent=s.cached_symbols.length;
+  document.getElementById("cache-status").innerHTML=s.cached_symbols.length
+    ? s.cached_symbols.map(f=>`<span class="muted">${f}</span>`).join("<br/>") : "<span class='muted'>empty — download first</span>";
+  if(s.running && s.running.running) setRunning(true, s.running.label);
+}
+async function loadResults(){
+  const d=await fetch("/api/results").then(r=>r.json());
+  const tb=document.getElementById("tbody");
+  if(!d.rows.length){ tb.innerHTML=`<tr><td colspan="7" class="muted">${d.note||"no run yet — hit Run"}</td></tr>`; return; }
+  tb.innerHTML=d.rows.map((r,i)=>`<tr onclick="location.href='strategy.html?sid=${r.strategy_id}'">
+    <td>${i+1}</td><td class="score">${r.robustness_score}</td>
+    <td><span class="badge ${r.eligible?"b-ok":"b-no"}">${r.eligible?"Y":"n"}</span></td>
+    <td>${r.total_trades}</td><td>${r.avg_profit_factor}</td><td>${r.avg_sharpe}</td><td>${r.label}</td></tr>`).join("");
+}
+async function loadFiles(){
+  const files=await fetch("/api/files").then(r=>r.json());
+  document.getElementById("files-count").textContent=files.length+" file(s)";
+  document.getElementById("fg").innerHTML=files.length?files.map(f=>`<div class="fc">
+    <div class="fn">${f.name}</div><div class="fm">${f.size_kb} KB · ${f.modified}</div>
+    <a class="btn btn-outline btn-sm" href="/api/files/download/${f.name}">Download</a></div>`).join("")
+    : `<div class="muted">no output files yet</div>`;
+}
+function val(id){ const v=document.getElementById(id).value; return v===""?null:v; }
+async function startRun(){
+  const seed=val("c-seed");
+  const payload={data_source:document.getElementById("c-src").value,
+    num:+val("c-num")||150, top:+val("c-top")||15, min_trades:+val("c-min")||0,
+    position_sizing:document.getElementById("c-size").value, risk_pct:(+val("c-risk")||10)/100,
+    seed:seed==null?null:+seed, validate_top:+val("c-val")||0, export_top:+val("c-exp")||0,
+    amipy_check_top:+val("c-ami")||0, plot_top:+val("c-plot")||0};
+  const r=await fetch("/api/run",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)}).then(r=>r.json());
+  if(r.error) toast(r.error,true); else setRunning(true,"starting…");
+}
+async function doFetch(interval,refresh){
+  const r=await fetch("/api/fetch",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({interval,refresh})}).then(r=>r.json());
+  if(r.error) return toast(r.error, true);
+  refreshAll(); toast("Download started");
+}
+async function doCustomFetch(){
+  const raw=document.getElementById("new-symbols").value.trim();
+  if(!raw) return toast("Enter at least one Yahoo ticker", true);
+  const r=await fetch("/api/fetch",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({symbols:raw, interval:document.getElementById("new-interval").value})}).then(r=>r.json());
+  if(r.error) return toast(r.error, true);
+  document.getElementById("new-symbols").value="";
+  refreshAll(); toast("Download started");
+}
+function statusBadge(s){
+  const m={"waiting":["b-waiting","Waiting"],"downloading":["b-downloading","Downloading"],
+    "cached":["b-success","Cached"],"success":["b-success","Done"],"error":["b-error","Error"]};
+  const [cls,label]=m[s]||m["waiting"];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+async function loadDl(){
+  const d=await fetch("/api/dl_state").then(r=>r.json());
+  document.getElementById("dl-body").innerHTML=Object.entries(d).map(([sym,v])=>
+    `<tr id="dlrow-${sym}"><td><b>${sym}</b></td><td>${statusBadge(v.status)}</td>
+     <td>${v.bars??"—"}</td><td class="muted">${v.file||""}</td>
+     <td class="muted">${v.msg||""}</td><td class="muted">${v.updated||""}</td></tr>`).join("");
+}
+function patchDlRow(e){
+  let tr=document.getElementById("dlrow-"+e.symbol);
+  if(!tr) return loadDl();
+  const c=tr.cells;
+  c[1].innerHTML=statusBadge(e.status);
+  c[2].textContent=e.bars??"—";
+  c[3].textContent=e.file||"";
+  c[4].textContent=e.msg||"";
+  c[5].textContent=e.updated||"";
+}
+async function loadHistory(){
+  const h=await fetch("/api/history").then(r=>r.json());
+  document.getElementById("hist-body").innerHTML=h.length?h.map(e=>
+    `<tr><td class="muted">${e.ts}</td><td>${e.type}</td><td>${e.label}</td>
+     <td><span class="badge ${e.ok?"b-success":"b-error"}">${e.ok?"OK":"FAIL"}</span></td>
+     <td>${e.duration_s??"—"}s</td><td class="muted">${e.error||""}</td></tr>`).join("")
+    :`<tr><td colspan="6" class="muted">nothing yet — runs and downloads land here</td></tr>`;
+}
+function refreshAll(){ refreshStatus(); loadResults(); loadDl(); loadHistory(); }
+refreshAll();
+</script>
+</body>
+</html>

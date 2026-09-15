@@ -1,0 +1,782 @@
+{
+  "S1017627": {
+    "walk_forward_by_asset": {
+      "BTC": {
+        "n_windows": 4,
+        "profitable_windows": 4,
+        "window_consistency": 1.0,
+        "window_returns_pct": [
+          605.0,
+          85.6,
+          29.3,
+          86.8
+        ]
+      },
+      "EURUSD": {
+        "n_windows": 4,
+        "profitable_windows": 1,
+        "window_consistency": 0.25,
+        "window_returns_pct": [
+          -0.9,
+          -1.1,
+          -0.7,
+          4.5
+        ]
+      },
+      "GOLD": {
+        "n_windows": 4,
+        "profitable_windows": 2,
+        "window_consistency": 0.5,
+        "window_returns_pct": [
+          -0.4,
+          -6.3,
+          4.0,
+          2.8
+        ]
+      },
+      "SPY": {
+        "n_windows": 4,
+        "profitable_windows": 3,
+        "window_consistency": 0.75,
+        "window_returns_pct": [
+          -13.1,
+          12.1,
+          2.7,
+          6.9
+        ]
+      },
+      "UST10Y": {
+        "n_windows": 4,
+        "profitable_windows": 2,
+        "window_consistency": 0.5,
+        "window_returns_pct": [
+          -0.7,
+          -1.2,
+          16.9,
+          39.6
+        ]
+      }
+    },
+    "avg_walk_forward_consistency": 0.6,
+    "monte_carlo": {
+      "n_trades": 103,
+      "insufficient_trades": false,
+      "return_p5_pct": 532.6,
+      "return_p50_pct": 2518.5,
+      "return_p95_pct": 11243.1,
+      "prob_losing_money": 0.0,
+      "worst_case_dd_pct": -36.4,
+      "median_max_dd_pct": -22.4
+    },
+    "monte_carlo_symbol": "BTC",
+    "neighbor_stability": {
+      "n_neighbors": 5,
+      "neighbor_viable_rate": 1.0,
+      "neighbor_avg_pf_mean": 1.51,
+      "neighbor_avg_pf_std": 0.16
+    },
+    "verdict": "PASS -- consistent across time, neighbors, and simulated re-draws"
+  },
+  "S4651305": {
+    "walk_forward_by_asset": {
+      "BTC": {
+        "n_windows": 4,
+        "profitable_windows": 4,
+        "window_consistency": 1.0,
+        "window_returns_pct": [
+          85010.9,
+          400.8,
+          385.2,
+          272.7
+        ]
+      },
+      "EURUSD": {
+        "n_windows": 4,
+        "profitable_windows": 1,
+        "window_consistency": 0.25,
+        "window_returns_pct": [
+          -1.4,
+          -2.0,
+          -0.6,
+          5.0
+        ]
+      },
+      "GOLD": {
+        "n_windows": 4,
+        "profitable_windows": 3,
+        "window_consistency": 0.75,
+        "window_returns_pct": [
+          1.1,
+          0.1,
+          8.5,
+          -0.7
+        ]
+      },
+      "SPY": {
+        "n_windows": 4,
+        "profitable_windows": 2,
+        "window_consistency": 0.5,
+        "window_returns_pct": [
+          0.2,
+          -5.2,
+          8.7,
+          -3.5
+        ]
+      },
+      "UST10Y": {
+        "n_windows": 4,
+        "profitable_windows": 2,
+        "window_consistency": 0.5,
+        "window_returns_pct": [
+          2.3,
+          48.1,
+          -22.5,
+          -7.2
+        ]
+      }
+    },
+    "avg_walk_forward_consistency": 0.6,
+    "monte_carlo": {
+      "n_trades": 165,
+      "insufficient_trades": false,
+      "return_p5_pct": 332417.8,
+      "return_p50_pct": 11394427.5,
+      "return_p95_pct": 442539150.1,
+      "prob_losing_money": 0.0,
+      "worst_case_dd_pct": -72.5,
+      "median_max_dd_pct": -51.2
+    },
+    "monte_carlo_symbol": "BTC",
+    "neighbor_stability": {
+      "n_neighbors": 2,
+      "neighbor_viable_rate": 0.5,
+      "neighbor_avg_pf_mean": 1.74,
+      "neighbor_avg_pf_std": 0.18
+    },
+    "verdict": "PASS -- consistent across time, neighbors, and simulated re-draws"
+  },
+  "S7975658": {
+    "walk_forward_by_asset": {
+      "BTC": {
+        "n_windows": 4,
+        "profitable_windows": 4,
+        "window_consistency": 1.0,
+        "window_returns_pct": [
+          120.6,
+          11.6,
+          46.9,
+          45.3
+        ]
+      },
+      "EURUSD": {
+        "n_windows": 4,
+        "profitable_windows": 2,
+        "window_consistency": 0.5,
+        "window_returns_pct": [
+          0.1,
+          4.0,
+          -0.0,
+          -0.9
+        ]
+      },
+      "GOLD": {
+        "n_windows": 4,
+        "profitable_windows": 3,
+        "window_consistency": 0.75,
+        "window_returns_pct": [
+          2.8,
+          0.8,
+          -0.0,
+          5.5
+        ]
+      },
+      "SPY": {
+        "n_windows": 4,
+        "profitable_windows": 2,
+        "window_consistency": 0.5,
+        "window_returns_pct": [
+          1.6,
+          3.4,
+          -0.6,
+          -3.9
+        ]
+      },
+      "UST10Y": {
+        "n_windows": 4,
+        "profitable_windows": 0,
+        "window_consistency": 0.0,
+        "window_returns_pct": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "avg_walk_forward_consistency": 0.55,
+    "monte_carlo": {
+      "n_trades": 245,
+      "insufficient_trades": false,
+      "return_p5_pct": 80.9,
+      "return_p50_pct": 441.9,
+      "return_p95_pct": 1353.9,
+      "prob_losing_money": 0.005,
+      "worst_case_dd_pct": -37.2,
+      "median_max_dd_pct": -22.4
+    },
+    "monte_carlo_symbol": "BTC",
+    "neighbor_stability": {
+      "n_neighbors": 4,
+      "neighbor_viable_rate": 1.0,
+      "neighbor_avg_pf_mean": 1.75,
+      "neighbor_avg_pf_std": 0.03
+    },
+    "verdict": "PASS -- consistent across time, neighbors, and simulated re-draws"
+  },
+  "S6743033": {
+    "walk_forward_by_asset": {
+      "BTC": {
+        "n_windows": 4,
+        "profitable_windows": 4,
+        "window_consistency": 1.0,
+        "window_returns_pct": [
+          107354.7,
+          374.4,
+          302.7,
+          47.8
+        ]
+      },
+      "EURUSD": {
+        "n_windows": 4,
+        "profitable_windows": 0,
+        "window_consistency": 0.0,
+        "window_returns_pct": [
+          -3.8,
+          -3.3,
+          -0.1,
+          -0.0
+        ]
+      },
+      "GOLD": {
+        "n_windows": 4,
+        "profitable_windows": 3,
+        "window_consistency": 0.75,
+        "window_returns_pct": [
+          2.9,
+          3.2,
+          8.1,
+          -7.5
+        ]
+      },
+      "SPY": {
+        "n_windows": 4,
+        "profitable_windows": 3,
+        "window_consistency": 0.75,
+        "window_returns_pct": [
+          -7.8,
+          4.9,
+          12.3,
+          2.6
+        ]
+      },
+      "UST10Y": {
+        "n_windows": 4,
+        "profitable_windows": 2,
+        "window_consistency": 0.5,
+        "window_returns_pct": [
+          -7.1,
+          -8.2,
+          2.7,
+          28.4
+        ]
+      }
+    },
+    "avg_walk_forward_consistency": 0.6,
+    "monte_carlo": {
+      "n_trades": 96,
+      "insufficient_trades": false,
+      "return_p5_pct": 170554.4,
+      "return_p50_pct": 7118405.6,
+      "return_p95_pct": 384019033.0,
+      "prob_losing_money": 0.0,
+      "worst_case_dd_pct": -58.5,
+      "median_max_dd_pct": -40.0
+    },
+    "monte_carlo_symbol": "BTC",
+    "neighbor_stability": {
+      "n_neighbors": 3,
+      "neighbor_viable_rate": 1.0,
+      "neighbor_avg_pf_mean": 2.52,
+      "neighbor_avg_pf_std": 0.63
+    },
+    "verdict": "PASS -- consistent across time, neighbors, and simulated re-draws"
+  },
+  "S8721139": {
+    "walk_forward_by_asset": {
+      "BTC": {
+        "n_windows": 4,
+        "profitable_windows": 4,
+        "window_consistency": 1.0,
+        "window_returns_pct": [
+          444032.1,
+          199.0,
+          326.2,
+          165.9
+        ]
+      },
+      "EURUSD": {
+        "n_windows": 4,
+        "profitable_windows": 2,
+        "window_consistency": 0.5,
+        "window_returns_pct": [
+          -5.1,
+          0.5,
+          -0.2,
+          1.1
+        ]
+      },
+      "GOLD": {
+        "n_windows": 4,
+        "profitable_windows": 2,
+        "window_consistency": 0.5,
+        "window_returns_pct": [
+          -0.6,
+          4.4,
+          11.6,
+          -0.3
+        ]
+      },
+      "SPY": {
+        "n_windows": 4,
+        "profitable_windows": 3,
+        "window_consistency": 0.75,
+        "window_returns_pct": [
+          6.9,
+          5.8,
+          -9.8,
+          10.3
+        ]
+      },
+      "UST10Y": {
+        "n_windows": 4,
+        "profitable_windows": 4,
+        "window_consistency": 1.0,
+        "window_returns_pct": [
+          0.9,
+          0.1,
+          17.1,
+          37.1
+        ]
+      }
+    },
+    "avg_walk_forward_consistency": 0.75,
+    "monte_carlo": {
+      "n_trades": 89,
+      "insufficient_trades": false,
+      "return_p5_pct": 669446.7,
+      "return_p50_pct": 46798197.3,
+      "return_p95_pct": 6432969903.7,
+      "prob_losing_money": 0.0,
+      "worst_case_dd_pct": -63.6,
+      "median_max_dd_pct": -41.4
+    },
+    "monte_carlo_symbol": "BTC",
+    "neighbor_stability": {
+      "n_neighbors": 2,
+      "neighbor_viable_rate": 1.0,
+      "neighbor_avg_pf_mean": 3.1,
+      "neighbor_avg_pf_std": 0.01
+    },
+    "verdict": "PASS -- consistent across time, neighbors, and simulated re-draws"
+  },
+  "S5907808": {
+    "walk_forward_by_asset": {
+      "BTC": {
+        "n_windows": 4,
+        "profitable_windows": 4,
+        "window_consistency": 1.0,
+        "window_returns_pct": [
+          585678.0,
+          446.3,
+          1005.8,
+          213.4
+        ]
+      },
+      "EURUSD": {
+        "n_windows": 4,
+        "profitable_windows": 1,
+        "window_consistency": 0.25,
+        "window_returns_pct": [
+          -8.0,
+          -6.3,
+          -2.9,
+          0.5
+        ]
+      },
+      "GOLD": {
+        "n_windows": 4,
+        "profitable_windows": 3,
+        "window_consistency": 0.75,
+        "window_returns_pct": [
+          -7.2,
+          8.4,
+          7.7,
+          3.2
+        ]
+      },
+      "SPY": {
+        "n_windows": 4,
+        "profitable_windows": 4,
+        "window_consistency": 1.0,
+        "window_returns_pct": [
+          2.8,
+          59.6,
+          21.9,
+          43.3
+        ]
+      },
+      "UST10Y": {
+        "n_windows": 4,
+        "profitable_windows": 2,
+        "window_consistency": 0.5,
+        "window_returns_pct": [
+          16.4,
+          -3.4,
+          -1.0,
+          25.8
+        ]
+      }
+    },
+    "avg_walk_forward_consistency": 0.7,
+    "monte_carlo": {
+      "n_trades": 216,
+      "insufficient_trades": false,
+      "return_p5_pct": 4034485.2,
+      "return_p50_pct": 253368550.2,
+      "return_p95_pct": 19560262520.1,
+      "prob_losing_money": 0.0,
+      "worst_case_dd_pct": -64.6,
+      "median_max_dd_pct": -46.8
+    },
+    "monte_carlo_symbol": "BTC",
+    "neighbor_stability": {
+      "n_neighbors": 3,
+      "neighbor_viable_rate": 1.0,
+      "neighbor_avg_pf_mean": 1.72,
+      "neighbor_avg_pf_std": 0.03
+    },
+    "verdict": "PASS -- consistent across time, neighbors, and simulated re-draws"
+  },
+  "S8284536": {
+    "walk_forward_by_asset": {
+      "BTC": {
+        "n_windows": 4,
+        "profitable_windows": 4,
+        "window_consistency": 1.0,
+        "window_returns_pct": [
+          826.7,
+          341.6,
+          229.4,
+          37.3
+        ]
+      },
+      "EURUSD": {
+        "n_windows": 4,
+        "profitable_windows": 2,
+        "window_consistency": 0.5,
+        "window_returns_pct": [
+          -0.5,
+          -8.7,
+          0.7,
+          4.6
+        ]
+      },
+      "GOLD": {
+        "n_windows": 4,
+        "profitable_windows": 2,
+        "window_consistency": 0.5,
+        "window_returns_pct": [
+          -2.6,
+          -0.6,
+          9.5,
+          9.5
+        ]
+      },
+      "SPY": {
+        "n_windows": 4,
+        "profitable_windows": 2,
+        "window_consistency": 0.5,
+        "window_returns_pct": [
+          -1.3,
+          -0.5,
+          22.0,
+          23.7
+        ]
+      },
+      "UST10Y": {
+        "n_windows": 4,
+        "profitable_windows": 4,
+        "window_consistency": 1.0,
+        "window_returns_pct": [
+          2.0,
+          11.4,
+          5.1,
+          21.0
+        ]
+      }
+    },
+    "avg_walk_forward_consistency": 0.7,
+    "monte_carlo": {
+      "n_trades": 164,
+      "insufficient_trades": false,
+      "return_p5_pct": 3867.3,
+      "return_p50_pct": 19902.1,
+      "return_p95_pct": 87908.8,
+      "prob_losing_money": 0.0,
+      "worst_case_dd_pct": -35.8,
+      "median_max_dd_pct": -23.1
+    },
+    "monte_carlo_symbol": "BTC",
+    "neighbor_stability": {
+      "n_neighbors": 4,
+      "neighbor_viable_rate": 1.0,
+      "neighbor_avg_pf_mean": 1.58,
+      "neighbor_avg_pf_std": 0.08
+    },
+    "verdict": "PASS -- consistent across time, neighbors, and simulated re-draws"
+  },
+  "S4365418": {
+    "walk_forward_by_asset": {
+      "BTC": {
+        "n_windows": 4,
+        "profitable_windows": 4,
+        "window_consistency": 1.0,
+        "window_returns_pct": [
+          105.9,
+          76.3,
+          20.1,
+          52.9
+        ]
+      },
+      "EURUSD": {
+        "n_windows": 4,
+        "profitable_windows": 3,
+        "window_consistency": 0.75,
+        "window_returns_pct": [
+          3.7,
+          2.7,
+          -1.2,
+          4.9
+        ]
+      },
+      "GOLD": {
+        "n_windows": 4,
+        "profitable_windows": 2,
+        "window_consistency": 0.5,
+        "window_returns_pct": [
+          6.9,
+          -5.3,
+          -0.2,
+          4.4
+        ]
+      },
+      "SPY": {
+        "n_windows": 4,
+        "profitable_windows": 4,
+        "window_consistency": 1.0,
+        "window_returns_pct": [
+          2.3,
+          4.5,
+          12.9,
+          12.5
+        ]
+      },
+      "UST10Y": {
+        "n_windows": 4,
+        "profitable_windows": 1,
+        "window_consistency": 0.25,
+        "window_returns_pct": [
+          -13.4,
+          18.4,
+          -15.2,
+          -27.3
+        ]
+      }
+    },
+    "avg_walk_forward_consistency": 0.7,
+    "monte_carlo": {
+      "n_trades": 188,
+      "insufficient_trades": false,
+      "return_p5_pct": 11.7,
+      "return_p50_pct": 583.7,
+      "return_p95_pct": 2809.0,
+      "prob_losing_money": 0.036,
+      "worst_case_dd_pct": -77.5,
+      "median_max_dd_pct": -50.5
+    },
+    "monte_carlo_symbol": "BTC",
+    "neighbor_stability": {
+      "n_neighbors": 4,
+      "neighbor_viable_rate": 1.0,
+      "neighbor_avg_pf_mean": 1.56,
+      "neighbor_avg_pf_std": 0.09
+    },
+    "verdict": "PASS -- consistent across time, neighbors, and simulated re-draws"
+  },
+  "S6457949": {
+    "walk_forward_by_asset": {
+      "BTC": {
+        "n_windows": 4,
+        "profitable_windows": 4,
+        "window_consistency": 1.0,
+        "window_returns_pct": [
+          526.2,
+          211.9,
+          197.2,
+          128.7
+        ]
+      },
+      "EURUSD": {
+        "n_windows": 4,
+        "profitable_windows": 1,
+        "window_consistency": 0.25,
+        "window_returns_pct": [
+          -2.1,
+          -6.0,
+          -1.4,
+          3.1
+        ]
+      },
+      "GOLD": {
+        "n_windows": 4,
+        "profitable_windows": 3,
+        "window_consistency": 0.75,
+        "window_returns_pct": [
+          5.6,
+          8.6,
+          13.6,
+          -2.3
+        ]
+      },
+      "SPY": {
+        "n_windows": 4,
+        "profitable_windows": 4,
+        "window_consistency": 1.0,
+        "window_returns_pct": [
+          3.8,
+          10.8,
+          21.3,
+          17.2
+        ]
+      },
+      "UST10Y": {
+        "n_windows": 4,
+        "profitable_windows": 2,
+        "window_consistency": 0.5,
+        "window_returns_pct": [
+          -2.0,
+          37.7,
+          -14.5,
+          23.8
+        ]
+      }
+    },
+    "avg_walk_forward_consistency": 0.7,
+    "monte_carlo": {
+      "n_trades": 146,
+      "insufficient_trades": false,
+      "return_p5_pct": 853.7,
+      "return_p50_pct": 10927.9,
+      "return_p95_pct": 111709.2,
+      "prob_losing_money": 0.001,
+      "worst_case_dd_pct": -72.2,
+      "median_max_dd_pct": -50.2
+    },
+    "monte_carlo_symbol": "BTC",
+    "neighbor_stability": {
+      "n_neighbors": 3,
+      "neighbor_viable_rate": 1.0,
+      "neighbor_avg_pf_mean": 1.59,
+      "neighbor_avg_pf_std": 0.09
+    },
+    "verdict": "PASS -- consistent across time, neighbors, and simulated re-draws"
+  },
+  "S9468640": {
+    "walk_forward_by_asset": {
+      "BTC": {
+        "n_windows": 4,
+        "profitable_windows": 4,
+        "window_consistency": 1.0,
+        "window_returns_pct": [
+          737.7,
+          195.5,
+          81.1,
+          71.3
+        ]
+      },
+      "EURUSD": {
+        "n_windows": 4,
+        "profitable_windows": 3,
+        "window_consistency": 0.75,
+        "window_returns_pct": [
+          0.5,
+          -2.9,
+          0.6,
+          6.1
+        ]
+      },
+      "GOLD": {
+        "n_windows": 4,
+        "profitable_windows": 2,
+        "window_consistency": 0.5,
+        "window_returns_pct": [
+          -2.8,
+          -9.2,
+          5.5,
+          7.3
+        ]
+      },
+      "SPY": {
+        "n_windows": 4,
+        "profitable_windows": 2,
+        "window_consistency": 0.5,
+        "window_returns_pct": [
+          -1.7,
+          11.7,
+          -1.2,
+          13.6
+        ]
+      },
+      "UST10Y": {
+        "n_windows": 4,
+        "profitable_windows": 3,
+        "window_consistency": 0.75,
+        "window_returns_pct": [
+          2.4,
+          29.5,
+          -4.1,
+          18.9
+        ]
+      }
+    },
+    "avg_walk_forward_consistency": 0.7,
+    "monte_carlo": {
+      "n_trades": 162,
+      "insufficient_trades": false,
+      "return_p5_pct": 1378.4,
+      "return_p50_pct": 9901.4,
+      "return_p95_pct": 56038.2,
+      "prob_losing_money": 0.0,
+      "worst_case_dd_pct": -61.7,
+      "median_max_dd_pct": -39.8
+    },
+    "monte_carlo_symbol": "BTC",
+    "neighbor_stability": {
+      "n_neighbors": 5,
+      "neighbor_viable_rate": 1.0,
+      "neighbor_avg_pf_mean": 1.53,
+      "neighbor_avg_pf_std": 0.08
+    },
+    "verdict": "PASS -- consistent across time, neighbors, and simulated re-draws"
+  }
+}

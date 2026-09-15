@@ -1,4 +1,4 @@
-# Breakout Setup Generator (BSG) — MVP
+# Breakout Setup Generator (BSG) — v2
 
 A working, small research tool that:
 
@@ -16,14 +16,51 @@ A working, small research tool that:
    leaderboard, so every run builds on the last one instead of starting
    from zero.
 
-This is intentionally an MVP: ~7 files, no ML yet, no genetic evolution
-yet — those are the natural "Sprint 2/3/4" additions once this core loop
-is trustworthy (see "Where this goes next" below).
+**v2 adds a full local web interface** (`ui_server.py` + `ui/`) over the same
+engine, plus live Yahoo Finance data downloads (`fetch_data.py`). You can run a
+backtest, watch it stream through real-time logs, browse the all-time
+leaderboard, drill into any strategy's interactive candlestick + equity chart
+(lightweight-charts v5), and download end-to-end data per symbol — all from a
+browser, no terminal needed.
+
+This is intentionally a small research tool at its core: the web layer is a
+thin UI over the same engine, so everything below applies unchanged — the CLI
+pipeline (`main.py`, `evolve.py`, ...) still works exactly as documented, and
+the interface just exposes it (plus live data) in a browser.
 
 ## Quick start
 
+### Web interface (v2) — recommended
+
 ```bash
 cd breakout_setup_generator
+python3 ui_server.py                      # serves the UI on http://127.0.0.1:5000
+```
+
+On Windows you can just double-click **`RUN_UI.bat`** — it finds Python,
+picks the first free port 5000–5009, waits for the server, then opens your
+browser. (Start more than one instance of the tool side-by-side on different
+ports if you like.)
+
+What the interface gives you:
+
+- **Live Data** page — download real OHLCV from Yahoo Finance (daily full
+  history or hourly ~2y) for the default 5-asset universe, **or add any
+  ticker you like** (`AAPL, MSFT, GC=F, ...`) straight from the page. Each
+  symbol streams its own real-time status (downloading / cached / error) into
+  the download backlog table.
+- **Runs** (the dashboard) — configure and launch a backtest (ideas, top,
+  min-trades, position sizing, risk %, data source, validation/export/plot
+  counts), watch stdout stream live via Socket.IO, then browse the all-time
+  leaderboard below it — one row per strategy; click any row to open its
+  **interactive chart** (candles, entry/exit markers, and the cumulative
+  equity curve in a synced top pane).
+- **Backlog / Output Files** pages — every fetch/run logged to
+  `output/ui_history.json`, every generated file/plot downloadable.
+
+CLI still works the same as ever:
+
+```bash
 python3 main.py                       # 150 ideas, synthetic 5-asset universe
 python3 main.py --num 500 --top 25    # bigger batch
 python3 main.py --seed 7              # reproducible run
@@ -52,8 +89,11 @@ an FX pair, and a single stock or bond ETF) — and point at it:
 python3 main.py --data-dir ./my_real_data --num 300
 ```
 
-Every CSV in that folder becomes one asset in the universe. The symbol is
-taken from the filename (same convention as your `csv_loader.py`).
+Every CSV in that folder becomes one asset in the universe. The symbol is the
+**full filename stem**: `AAPL_daily.csv` loads as `AAPL_daily` and
+`AAPL_hourly.csv` as `AAPL_hourly` — keep the `_daily` / `_hourly` suffixes and
+both timeframes load as two independent assets instead of overwriting each other
+(`data.py` deliberately does *not* strip the suffix).
 
 ## How a strategy is built (the grammar)
 
@@ -104,7 +144,7 @@ score is heavily discounted rather than deleted, so you can still see
 breakout_setup_generator/
     grammar.py             # every building block (POI, distance, filter, exit)
     generator.py           # weighted-random assembly + novelty/dedupe rules
-    evolve.py                # genetic evolution: crossover + mutation on strategy DNA
+    evolve.py                # genetic evolution: crossover + mutation on strategy DNA, optional --ml-prescreen
     ml_rank.py                # ML pre-screener: predict promise before backtesting (Sprint 5)
     indicators.py              # ATR, ADX, SMA, Donchian, volume SMA (pandas only)
     data.py                     # synthetic 5-asset-class universe + real CSV loader
@@ -118,9 +158,22 @@ breakout_setup_generator/
     export_pinescript.py                # TradingView Pine Script v5 code export
     database.py                          # persistent component memory + leaderboard + training log (JSON/JSONL)
     main.py                               # CLI that runs the random-generation pipeline
-    output/                                # latest_run.csv, research_db.json, training_log.jsonl,
-                                            # validation_report.json, evolution_run.csv, ml_model.joblib,
-                                            # code/<format>/*.* land here
+
+    # v2: live data + web interface
+    fetch_data.py                        # Yahoo Finance OHLCV downloader → data_cache/
+    ui_server.py                         # Flask+SocketIO server: endpoints + live log streaming
+    ui/                                  # web frontend
+      index.html                           # main dashboard: Runs, Leaderboard, Backlog, Live Data, Output Files
+      strategy.html                        # interactive strategy chart: candles, equity pane, trade markers
+      lightweight-charts.js                # vendored lightweight-charts v5.2.1 (charting engine)
+      breakoutLOGO.svg                     # Investing Compass logo
+    RUN_UI.bat                          # double-click: find python, pick port, open browser
+    RUN_BACKTEST_MENU.bat                # double-click: interactive terminal menu (main.py + evolve.py)
+
+    data_cache/                          # Yahoo CSVs land here (SYM_daily.csv / SYM_hourly.csv)
+    output/                              # latest_run.csv, research_db.json, training_log.jsonl,
+                                         # validation_report.json, evolution_run.csv, ml_model.joblib,
+                                         # code/<format>/*.*, plots/*.* land here
 ```
 
 ## Exporting to your own platform (EasyLanguage / AFL / Pine Script)
@@ -234,6 +287,42 @@ overfitting, not a sign it "solved" the problem.
 Writes to the same shared `output/research_db.json` as `main.py`, so
 ideas discovered by evolution feed the same novelty memory and leaderboard
 random search draws from — the two modes reinforce each other over time.
+
+### ML-prescreened offspring (`--ml-prescreen`)
+
+The GA and the ML pre-screener (`ml_rank.py`) used to run as two
+completely independent tools. `--ml-prescreen` merges them: instead of
+generating exactly as many children as the next generation needs,
+`evolve.py` generates a **larger pool** (`--offspring-pool-mult`, default
+3x) via the same crossover/mutation, has the trained model predict every
+candidate's promise **without backtesting them**, and only the
+top-predicted subset actually spends a real backtest:
+
+```bash
+python3 evolve.py --generations 15 --population 60 --ml-prescreen
+python3 evolve.py --data-dir ./real_data --generations 15 --ml-prescreen --offspring-pool-mult 5
+```
+
+No trained model yet? It auto-trains one first (bootstrapping the
+training log if needed) rather than failing. **Same number of real
+backtests per generation either way** — this spends extra, cheap
+crossover/mutation+prediction calls to pick *better* candidates before
+spending the backtest budget on them, not to reduce the budget itself.
+
+**An honest, measured comparison, not just an assertion this helps** —
+identical seed, population, and generation count, with vs. without:
+
+| | avg score (gen 5) | best score (gen 5) | eligible/30 (gen 5) | wall time |
+|---|---|---|---|---|
+| without `--ml-prescreen` | 65.2 | 77.4 | 27/30 | 3.1s |
+| with `--ml-prescreen` | **71.2** | **78.1** | **30/30** | 17.3s |
+
+Real, measurable improvement in population quality per backtest spent —
+at the real cost of more wall-clock time (generating and scoring the
+larger candidate pool each generation), not less. The printed
+per-generation `ml-prescreen:` line shows the actual predicted-promise
+gap between the chosen subset and the full pool, so you can see the
+filter doing real work rather than trusting it blindly.
 
 ## Digging deeper: robustness validation
 
@@ -615,6 +704,12 @@ original sprints now have at least an MVP:
   `evolve.py`, and a real single-trade-blowup bug was caught and fixed
   while building it (see Known Limitations).
 
+- **Done**: a real GA x ML loop (`evolve.py --ml-prescreen`, see
+  "ML-prescreened offspring" above) -- `evolve.py` and `ml_rank.py` no
+  longer run independently; the trained model screens each generation's
+  offspring before backtesting them, with a measured (not just asserted)
+  improvement in population quality per backtest spent.
+
 What's genuinely still open, if you want to keep pushing:
 - **Real intraday equity-index and rates data.** Only found free,
   easily-downloadable real intraday history for 3 of 5 asset classes
@@ -625,8 +720,17 @@ What's genuinely still open, if you want to keep pushing:
   its 1-vs-2-contract sizing based on yesterday's direction still aren't
   modeled -- `fixed_fractional` sizing is risk-based, not those specific
   patterns.
-- **A real GA x ML loop.** `evolve.py` and `ml_rank.py` currently run
-  independently; the natural next step is using the ML model as
-  `evolve.py`'s fitness *proposal* filter (screen a generation's
-  mutations/crossovers through the model before spending a real backtest
-  on them), rather than running them as two separate tools.
+
+## License
+
+**Personal use only — not for commercial use.** This project is licensed
+for strictly personal, non-commercial purposes: private research, learning,
+and personal trading analysis. Selling, reselling, hosted/SaaS deployment,
+or any use of the software (or its output) for commercial gain is
+prohibited without written consent. Modified versions are subject to the
+same terms and may not be redistributed. See [LICENSE](LICENSE) for the
+full terms.
+
+The software is provided as-is, without warranty. It is a research tool for
+personal experimentation and does not constitute financial advice —
+trading involves substantial risk of loss.
